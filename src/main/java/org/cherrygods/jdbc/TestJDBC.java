@@ -21,20 +21,16 @@ import java.sql.SQLException;
  */
 public class TestJDBC {
     public static void main(String[] args) throws SQLException {
-        final String URL = "jdbc:mysql://localhost:3306/test";
-        final String USERNAME = "root";
-        final String PASSWORD = "CherryGods";
-        loadDriver();
-        Connection connection = getConnection(URL, USERNAME, PASSWORD);
-        insertStu(connection,"李天宇","男",16);
-        findAll(connection);
+//        insertStu("李天宇","男",16);
+        updateStu(9,"马燕清","女",17);
+        findAll();
     }
-
     /**
-     * 查询所有学生信息
-     * @param connection
+     * 查询所有学的信息
      */
-    public static void findAll(Connection connection) {
+    public static void findAll() {
+        loadDriver();
+        Connection connection = getConnection();
         try {
             //查询所有学生信息
             PreparedStatement ps = connection.prepareStatement("SELECT id,name,sex,age FROM stu");
@@ -53,10 +49,25 @@ public class TestJDBC {
             System.out.println("查询失败!");
             e.printStackTrace();
         }finally {
-
+            if(connection!=null){
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
-    public static void insertStu(Connection connection,String stuName,String stuSex,int stuAge){
+
+    /**
+     * 新增一个名学生
+     * @param stuName
+     * @param stuSex
+     * @param stuAge
+     */
+    public static void insertStu(String stuName,String stuSex,int stuAge){
+        loadDriver();
+        Connection connection = getConnection();
         try {
             PreparedStatement ps = connection.prepareStatement("INSERT INTO stu(name, sex, age) values (?,?,?)");
             ps.setString(1,stuName);
@@ -68,7 +79,45 @@ public class TestJDBC {
         } catch (SQLException e) {
             e.printStackTrace();
         }finally {
+            if (connection!=null){
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
+    /**
+     * 修改一名学生的身份信息
+     * @param id
+     * @param stuName
+     * @param stuSex
+     * @param stuAge
+     */
+    public static void updateStu(int id,String stuName,String stuSex,int stuAge){
+        loadDriver();
+        Connection connection = getConnection();
+        try {
+            PreparedStatement ps= connection.prepareStatement("update stu set name=?,sex=?,age=? where id=?");
+            ps.setString(1,stuName);
+            ps.setString(2,stuSex);
+            ps.setInt(3,stuAge);
+            ps.setInt(4,id);
+            int reuslt = ps.executeUpdate();
+            System.out.println("受影响的行数"+reuslt);
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            if (connection!=null){
+                try {
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
     /**
@@ -84,15 +133,14 @@ public class TestJDBC {
 
     /**
      * 获取数据库连接
-     *
-     * @param url      mysql连接
-     * @param username 用户名
-     * @param password 密码
      * @return 连接
      */
-    public static Connection getConnection(String url, String username, String password) {
+    public static Connection getConnection() {
+        final String URL = "jdbc:mysql://localhost:3306/test";
+        final String USERNAME = "root";
+        final String PASSWORD = "CherryGods";
         try {
-            Connection connection = (Connection) DriverManager.getConnection(url, username, password);
+            Connection connection = (Connection) DriverManager.getConnection(URL, USERNAME, PASSWORD);
             if (connection != null) {
                 System.out.println("Connection连接成功！");
                 return connection;
