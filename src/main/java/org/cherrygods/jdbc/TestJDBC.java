@@ -22,7 +22,7 @@ import java.sql.SQLException;
 public class TestJDBC {
     public static void main(String[] args) throws SQLException {
 //        insertStu("李天宇","男",16);
-        updateStu(9,"马燕清","女",17);
+        deleteStu(9);
         findAll();
     }
     /**
@@ -118,6 +118,27 @@ public class TestJDBC {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    /**
+     * 根据id删除玩家
+     * @param id
+     */
+    public static void deleteStu(int id){
+        loadDriver();
+        Connection connection = getConnection();
+        try {
+            PreparedStatement ps = connection.prepareStatement("DELETE FROM stu where id=?");
+            ps.setInt(1,id);
+            int result = ps.executeUpdate();
+            if(result!=-1){
+                System.out.println("删除成功！");
+            }else{
+                System.out.println("删除失败");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
     /**
